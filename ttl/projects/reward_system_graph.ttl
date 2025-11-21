@@ -1,0 +1,89 @@
+@prefix ex:    <http://example.com/ns#> .
+@prefix schema:<http://schema.org/> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+#################################################################
+# この GraphRAG 自体のルート
+#################################################################
+
+ex:RewardSystemGraphRoot a ex:GraphRoot ;
+    schema:name "報酬モデル設計 GraphRAG ルート"@ja ;
+    ex:project ex:Project_AYCorpRewardModel ;
+    ex:mainGoal ex:Goal_FairAndSustainableReward .
+
+#################################################################
+# プロジェクト
+#################################################################
+
+ex:Project_AYCorpRewardModel a ex:Project ;
+    schema:name "AY株式会社 動画編集・企画向け報酬モデル"@ja ;
+    ex:hasComponent ex:Component_BasePay ,
+                    ex:Component_TaskPoint ,
+                    ex:Component_ProjectBonus .
+
+#################################################################
+# コンポーネント
+#################################################################
+
+ex:Component_BasePay a ex:RewardComponent ;
+    schema:name "固定的な最低保証額"@ja ;
+    ex:description "月額で支払う基本報酬。安定性を担保するが、インセンティブは弱い。"@ja .
+
+ex:Component_TaskPoint a ex:RewardComponent ;
+    schema:name "タスクポイント制"@ja ;
+    ex:description "動画1本編集・サムネ・ショート切り抜きなど、タスクごとにポイントを付与し、月間ポイントに応じて報酬を配分。"@ja ;
+    ex:relatedTaskType ex:TaskType_Editing ,
+                       ex:TaskType_Thumbnail ,
+                       ex:TaskType_SNS .
+
+ex:Component_ProjectBonus a ex:RewardComponent ;
+    schema:name "プロジェクト単位の成果報酬"@ja ;
+    ex:description "売上や登録者増加、再生数などの成果指標に応じて、プロジェクト参加メンバーにボーナスを分配。"@ja .
+
+#################################################################
+# タスクタイプ
+#################################################################
+
+ex:TaskType_Editing a ex:TaskType ;
+    schema:name "長尺動画編集"@ja ;
+    ex:defaultPoint "5"^^xsd:integer .
+
+ex:TaskType_Thumbnail a ex:TaskType ;
+    schema:name "サムネイル制作"@ja ;
+    ex:defaultPoint "2"^^xsd:integer .
+
+ex:TaskType_SNS a ex:TaskType ;
+    schema:name "SNS投稿・告知"@ja ;
+    ex:defaultPoint "1"^^xsd:integer .
+
+#################################################################
+# ゴール・制約
+#################################################################
+
+ex:Goal_FairAndSustainableReward a ex:Goal ;
+    schema:name "メンバーにとって公平で、会社にとって持続可能な報酬モデル"@ja ;
+    ex:metric "メンバー満足度 / 1人あたり粗利 / 離脱率" ;
+    ex:constraint ex:Constraint_CashFlow ,
+                  ex:Constraint_WorkloadBalance .
+
+ex:Constraint_CashFlow a ex:Constraint ;
+    schema:name "キャッシュフローを壊さない"@ja ;
+    ex:description "月次でキャッシュアウトが売上を大きく上回らないこと。"@ja .
+
+ex:Constraint_WorkloadBalance a ex:Constraint ;
+    schema:name "負荷の偏りを放置しない"@ja ;
+    ex:description "同じ少人数にだけタスクが集中し続けないように設計する。"@ja .
+
+#################################################################
+# 簡易スキーマ
+#################################################################
+
+ex:RewardComponent a rdfs:Class .
+ex:TaskType        a rdfs:Class .
+ex:Constraint      a rdfs:Class .
+
+ex:hasComponent    a rdf:Property .
+ex:relatedTaskType a rdf:Property .
+ex:defaultPoint    a rdf:Property .
