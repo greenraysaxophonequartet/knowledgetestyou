@@ -1,0 +1,109 @@
+@prefix ex:    <http://example.com/ns#> .
+@prefix schema:<http://schema.org/> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+
+#################################################################
+# この GraphRAG 自体を表すルートノード
+#################################################################
+
+ex:VideoEditingGraphRoot a ex:GraphRoot ;
+    schema:name "動画編集ワークフロー GraphRAG ルート"@ja ;
+    ex:project ex:Project_RehearsalChannel ;
+    ex:mainGoal ex:Goal_FasterEditing .
+
+#################################################################
+# プロジェクトノード
+#################################################################
+
+ex:Project_RehearsalChannel a ex:Project ;
+    schema:name "サクソフォンカルテット リハーサルチャンネル"@ja ;
+    ex:hasPhase ex:Phase_Recording ,
+                ex:Phase_Editing ,
+                ex:Phase_Publishing .
+
+#################################################################
+# フェーズノード
+#################################################################
+
+ex:Phase_Recording a ex:Phase ;
+    schema:name "収録フェーズ"@ja ;
+    ex:hasTask ex:Task_SetupCameras ,
+               ex:Task_AudioCheck .
+
+ex:Phase_Editing a ex:Phase ;
+    schema:name "編集フェーズ"@ja ;
+    ex:hasTask ex:Task_Transcription ,
+               ex:Task_RoughCut ,
+               ex:Task_InsertSubtitles .
+
+ex:Phase_Publishing a ex:Phase ;
+    schema:name "公開フェーズ"@ja ;
+    ex:hasTask ex:Task_Thumbnail ,
+               ex:Task_DescriptionWriting ,
+               ex:Task_SNSShare .
+
+#################################################################
+# タスクノード（抜粋）
+#################################################################
+
+ex:Task_SetupCameras a ex:Task ;
+    schema:name "カメラ・音声のセットアップ"@ja ;
+    ex:owner ex:Role_TechnicalDirector ;
+    ex:dependsOn ex:Task_StudioBooking .
+
+ex:Task_Transcription a ex:Task ;
+    schema:name "音声認識による文字起こし"@ja ;
+    ex:tool "Whisper / その他STT" ;
+    ex:outputType "テキスト or SRT" ;
+    ex:feeds ex:Task_InsertSubtitles .
+
+ex:Task_RoughCut a ex:Task ;
+    schema:name "不要部分のカット・構成ラフ"@ja ;
+    ex:dependsOn ex:Task_Transcription ;
+    ex:owner ex:Role_Editor .
+
+ex:Task_InsertSubtitles a ex:Task ;
+    schema:name "テロップ・字幕の挿入"@ja ;
+    ex:dependsOn ex:Task_RoughCut ;
+    ex:owner ex:Role_Editor .
+
+#################################################################
+# 役割ノード
+#################################################################
+
+ex:Role_TechnicalDirector a ex:Role ;
+    schema:name "テクニカルディレクター（収録担当）"@ja .
+
+ex:Role_Editor a ex:Role ;
+    schema:name "動画編集担当"@ja .
+
+#################################################################
+# ゴールノード
+#################################################################
+
+ex:Goal_FasterEditing a ex:Goal ;
+    schema:name "編集にかかる総時間を半分にする"@ja ;
+    ex:metric "1本あたりの編集工数（時間）" ;
+    ex:relatedTask ex:Task_Transcription ,
+                   ex:Task_RoughCut ,
+                   ex:Task_InsertSubtitles .
+
+#################################################################
+# 簡易スキーマ
+#################################################################
+
+ex:GraphRoot a rdfs:Class .
+ex:Project   a rdfs:Class .
+ex:Phase     a rdfs:Class .
+ex:Task      a rdfs:Class .
+ex:Role      a rdfs:Class .
+ex:Goal      a rdfs:Class .
+
+ex:hasPhase    a rdf:Property .
+ex:hasTask     a rdf:Property .
+ex:dependsOn   a rdf:Property .
+ex:feeds       a rdf:Property .
+ex:owner       a rdf:Property .
+ex:metric      a rdf:Property .
+ex:relatedTask a rdf:Property .

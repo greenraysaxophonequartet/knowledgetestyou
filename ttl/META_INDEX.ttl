@@ -1,0 +1,57 @@
+@prefix ex:    <http://example.com/ns#> .
+@prefix schema:<http://schema.org/> .
+@prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+#################################################################
+# メタグラフ（Graph-of-Graphs）
+#################################################################
+
+ex:MetaGraph a ex:GraphRAGIndex ;
+    rdfs:label "テスト用 分散GraphRAG メタインデックス"@ja ;
+    ex:hasGraph ex:VideoEditingGraph ,
+                ex:RewardSystemGraph .
+
+#################################################################
+# 各 GraphRAG ノード（＝下位グラフを表すノード）
+#################################################################
+
+ex:VideoEditingGraph a ex:GraphRAG ;
+    schema:name "動画編集ワークフロー GraphRAG"@ja ;
+    ex:domain "video_editing" ;
+    ex:entryFile "ttl/projects/video_editing_graph.ttl" ;
+    ex:description "長尺のリハーサル動画をどのように編集・公開まで持っていくかを表現したグラフ。"@ja ;
+    ex:priority "1"^^xsd:integer .
+
+ex:RewardSystemGraph a ex:GraphRAG ;
+    schema:name "報酬モデル設計 GraphRAG"@ja ;
+    ex:domain "reward_system" ;
+    ex:entryFile "ttl/projects/reward_system_graph.ttl" ;
+    ex:description "動画編集タスクや企画貢献度に応じて報酬を配分する仕組みを表現したグラフ。"@ja ;
+    ex:priority "2"^^xsd:integer ;
+    ex:relatedTo ex:VideoEditingGraph .
+
+#################################################################
+# 簡単なスキーマ定義（LLMが意味を推測しやすくするため）
+#################################################################
+
+ex:GraphRAGIndex a rdfs:Class ;
+    rdfs:label "GraphRAG のメタインデックス"@ja .
+
+ex:GraphRAG a rdfs:Class ;
+    rdfs:label "1つのドメインを表現する GraphRAG"@ja .
+
+ex:hasGraph a rdf:Property ;
+    rdfs:label "配下の GraphRAG を指す関係"@ja ;
+    rdfs:domain ex:GraphRAGIndex ;
+    rdfs:range  ex:GraphRAG .
+
+ex:entryFile a rdf:Property ;
+    rdfs:label "この GraphRAG のエントリーとなる TTL ファイルパス"@ja .
+
+ex:domain a rdf:Property ;
+    rdfs:label "GraphRAG の対象ドメイン"@ja .
+
+ex:relatedTo a rdf:Property ;
+    rdfs:label "関連する GraphRAG どうしの関係"@ja .
